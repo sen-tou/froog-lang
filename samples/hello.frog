@@ -1,0 +1,44 @@
+// This is a comment
+
+// Arithmetics
+var a = 3
+var b = 6
+
+a + b
+a - b
+a * b
+a / b
+a += b
+a -= b
+a *= b
+a /= b
+a % b
+
+// explicit operators for bitwise operations
+a or b
+a and b
+a xor b
+not a // example: not(a or b)
+a << b
+a >> b
+
+// branching
+var c = True
+var d = False 
+
+if c: 1 else 2 // return value ommited
+var is_it2 = if c: 1 elseif d: 2 else 3 // last expression is returned  
+var is_it = if c {
+    4 // last expresson is returned 
+} elseif d { 
+    var sum = a + b 
+    b // returns b as it is the last expression
+} else { 
+    var dif = a - b // returns the evaluated a - b and immeadiatly drops the dif as out of scope
+}
+
+
+var x = if c == {
+    case True: a,
+    default: b
+}
