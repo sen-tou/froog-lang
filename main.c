@@ -11,7 +11,7 @@ int main(int argc, char **argv)
 
     froog_read_file(file_path, &f_info);
 
-    froog_next(&f_info, &tokens);
+    froog_lex(&f_info, &tokens);
 
     froog_close_file(&f_info);
 }
