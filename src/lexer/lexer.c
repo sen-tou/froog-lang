@@ -1,5 +1,6 @@
 #include "lexer.h"
 #include "../error.h"
+#include "../utils/enum_to_string.c"
 #include <assert.h>
 #include <ctype.h>
 #include <regex.h>
@@ -8,24 +9,37 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 
 // keep order for precendence
-static const char *identifier_patterns[] = {
-    "^[0-9](_?[0-9])*(\\.[0-9](_?[0-9])*)?$", // number
-    "^[A-Za-z][A-Za-z0-9_]*$", // generic identifier (vars, keywords)
-};
+static const char *identifier_patterns[]
+    = {
+          "^[0-9](_?[0-9])*(\\.[0-9](_?[0-9])*)?$", // number
+          "^[A-Za-z][A-Za-z0-9_]*$", // generic identifier (vars, keywords)
+      };
 static const froog_token_type identifier_mappings[] = {
     NUMBER, // number
     IDENTIFIER, // identifier
 };
 
+static const char *const froog_token_name[] = { NAMES };
+
 static bool initialized = false;
 
-static void froog_token_append(froog_tokens *tokens, froog_token token)
+static bool froog_token_append(froog_tokens *ft, froog_token token)
 {
-    assert(initialized);
+    if (ft->length >= ft->capacity) {
+        size_t increased_capacity = 2 * ft->capacity;
+        froog_token *new_tokens = realloc(ft, increased_capacity * sizeof(token));
+        if (new_tokens == NULL) {
+            return false;
+        }
+        ft->tokens = new_tokens;
+        ft->capacity = increased_capacity;
+    }
 
-    tokens->tokens[tokens->length++] = token;
+    ft->tokens[ft->length++] = token;
+    return true;
 }
 
 static bool froog_match(froog_file_info *f_info, char *to_match)
@@ -173,12 +187,13 @@ static froog_token_type froog_match_symbols(froog_file_info *f_info, int ch)
     return t;
 }
 
-static bool froog_next(froog_file_info *f_info, froog_tokens *tokens)
+static bool froog_next_token(froog_file_info *f_info, froog_tokens *tokens)
 {
-    void *value = { 0 };
+    void *value = NULL;
     int ch = fgetc(f_info->file);
-    if (ch == EOF)
+    if (ch == EOF) {
         return false;
+    }
 
     froog_token_type t = froog_match_symbols(f_info, ch);
 
@@ -189,6 +204,7 @@ static bool froog_next(froog_file_info *f_info, froog_tokens *tokens)
         .value = { value },
     };
     froog_token_append(tokens, token);
+
     return true;
 }
 
@@ -226,5 +242,47 @@ void froog_lex(froog_file_info *f_info, froog_tokens *tokens)
 {
     assert(initialized);
 
-    while (froog_next(f_info, tokens)) { }
+    while (froog_next_token(f_info, tokens)) { }
+}
+
+froog_tokens *froog_create_tokens(size_t init_capacity)
+{
+    assert(initialized);
+
+    froog_tokens *ft = malloc(sizeof(froog_tokens));
+    if (ft == NULL) {
+        PANIC("Could not initialize froog tokens.")
+    }
+    ft->length = 0;
+    ft->capacity = init_capacity;
+    ft->tokens = malloc(init_capacity * sizeof(froog_token));
+    if (!ft->tokens) {
+        free(ft);
+        PANIC("Could not initialize froog token.")
+    }
+    return ft;
+}
+
+void froog_free_tokens(froog_tokens *ft)
+{
+    free(ft->tokens);
+    free(ft);
+}
+
+void froog_intermediate_representation(froog_tokens *ft)
+{
+    struct stat st = { 0 };
+    if (stat("build/artifacts", &st) == -1) {
+        mkdir("build/artifacts", 0700);
+    }
+
+    FILE *fp = fopen("build/artifacts/intermediate.froog_inter", "w+");
+    if (fp == NULL) {
+        PANIC("Could not create intermediate file.")
+    }
+
+    for (size_t i = 0; i < ft->length; i++) {
+        froog_token_type t = ft->tokens[i].type;
+        fprintf(fp, "%s\n", froog_token_name[t]);
+    }
 }

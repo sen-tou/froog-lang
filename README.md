@@ -47,4 +47,5 @@ if ... then {} else {} -> block needs a return
 
 ## Ressources
 
-- [https://craftinginterpreters.com](Craftning Interpreters)
+- [Crafting Interpreters](https://craftinginterpreters.com)
+- [TOML spec](https://toml.io/en/v1.0.0)
