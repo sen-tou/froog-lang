@@ -7,6 +7,7 @@ This project is purely recreational and just serves my own purposes.
 
 ### Core
 - structs
+- basic arithmetics
 - turing complete
 - functions
 - everything is an expression
@@ -17,6 +18,7 @@ This project is purely recreational and just serves my own purposes.
 - compiler and REPL
 - Result/Option typed
 - manual memory managment / optional garbage collector
+- a toml like config file to configure the lexer/parser/compiler
 
 #### Syntax
 - Types: UpperCamelCase
@@ -25,8 +27,10 @@ This project is purely recreational and just serves my own purposes.
 - variables: lowerCamelCase
 
 #### Data Types
+- NO NULL
 - Booleans
-- Option
+- Option (like)
+- Result (like) 
 
 #### Expression Evaluation
 - if: evaluates to one branch with its return value

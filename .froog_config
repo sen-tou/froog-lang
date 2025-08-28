@@ -1,0 +1,10 @@
+# Froog compiler configuration
+# $VAR expression can be used in string to replace some env vars
+# only the following vars are taken from enviroment
+#   $USER
+
+
+[build]
+search_paths = ["home/$USER/.config/froog/.froog_config" ]
+dir = "build"
+

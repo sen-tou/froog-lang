@@ -1,4 +1,4 @@
-#include "src/lexer/lexer.h"
+#include "lexer/lexer.h"
 #include <assert.h>
 
 int main(int argc, char **argv)
@@ -14,4 +14,6 @@ int main(int argc, char **argv)
     froog_lex(&f_info, &tokens);
 
     froog_close_file(&f_info);
+
+    return 0;
 }
